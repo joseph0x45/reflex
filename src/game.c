@@ -1,4 +1,5 @@
 #include "game.h"
+#include "ball.h"
 #include "common.h"
 #include "player.h"
 #include <raylib.h>
@@ -15,45 +16,64 @@ Game *init_game() {
   game->p1 = p1;
   Player *p2 = init_player(2);
   game->p2 = p2;
+  Ball *b = init_ball();
+  game->ball = b;
   game->state = EXITED;
   return game;
 }
 
 void draw_game(Game *game) {
   DrawLine(0, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT / 2, GREEN);
+  DrawLine(WINDOW_WIDTH / 2, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT, GREEN);
   draw_player(game->p1);
   draw_player(game->p2);
+  draw_ball(game->ball);
+}
+
+static void handle_player_movement(int no, Player *p) {
+  if (no == 1) {
+    if (IsKeyDown(KEY_W)) {
+      p->rec.y -= p->velocity;
+    }
+    if (IsKeyDown(KEY_S)) {
+      p->rec.y += p->velocity;
+    }
+  } else {
+    if (IsKeyDown(KEY_UP)) {
+      p->rec.y -= p->velocity;
+    }
+    if (IsKeyDown(KEY_DOWN)) {
+      p->rec.y += p->velocity;
+    }
+  }
+  if (p->rec.y <= 0) {
+    p->rec.y = 0;
+  } else if (p->rec.y >= WINDOW_HEIGHT - p->rec.height) {
+    p->rec.y = WINDOW_HEIGHT - p->rec.height;
+  }
+}
+
+void handle_ball_player_interaction(Player *p, Ball *b) {
+  if (CheckCollisionRecs(p->rec, b->rec)) {
+    b->direction.x *= -1;
+  }
 }
 
 void handle_input(Game *game) {
-  if (IsKeyDown(KEY_W)) {
-    if (game->p1->y != 0) {
-      game->p1->y = game->p1->y - 1 * game->p1->velocity <= 0
-                        ? 0
-                        : game->p1->y - 1 * game->p1->velocity;
-    }
+  handle_player_movement(1, game->p1);
+  handle_player_movement(2, game->p2);
+  game->ball->rec.x += game->ball->velocity * game->ball->direction.x;
+  game->ball->rec.y += game->ball->velocity * game->ball->direction.y;
+  if ((game->ball->rec.y <= 0) ||
+      (game->ball->rec.y >= WINDOW_HEIGHT - game->ball->rec.height)) {
+    game->ball->direction.y *= -1;
   }
-  if (IsKeyDown(KEY_S)) {
-    if (game->p1->y != WINDOW_HEIGHT - game->p1->height) {
-      game->p1->y = game->p1->y + 1 * game->p1->velocity >=
-                            WINDOW_HEIGHT - game->p1->height
-                        ? WINDOW_HEIGHT - game->p1->height
-                        : game->p1->y + 1 * game->p1->velocity;
-    }
-  }
-  if (IsKeyDown(KEY_UP)) {
-    if (game->p2->y != 0) {
-      game->p2->y = game->p2->y - 1 * game->p2->velocity <= 0
-                        ? 0
-                        : game->p2->y - 1 * game->p2->velocity;
-    }
-  }
-  if (IsKeyDown(KEY_DOWN)) {
-    if (game->p2->y != WINDOW_HEIGHT - game->p2->height) {
-      game->p2->y = game->p2->y + 1 * game->p2->velocity >=
-                            WINDOW_HEIGHT - game->p2->height
-                        ? WINDOW_HEIGHT - game->p2->height
-                        : game->p2->y + 1 * game->p2->velocity;
-    }
+
+  handle_ball_player_interaction(game->p1, game->ball);
+  handle_ball_player_interaction(game->p2, game->ball);
+  if ((game->ball->rec.x <= 0) || (game->ball->rec.x >= WINDOW_WIDTH)) {
+    // TODO: Make this better
+    free(game->ball);
+    game->ball = init_ball();
   }
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "ball.h"
 #include "player.h"
 
 typedef enum {
@@ -10,6 +11,7 @@ typedef enum {
 typedef struct {
   Player *p1;
   Player *p2;
+  Ball *ball;
   GameState state;
 } Game;
 
