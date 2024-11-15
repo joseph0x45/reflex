@@ -1,10 +1,8 @@
 #pragma once
+#include "bonus.h"
 #include <raylib.h>
-typedef enum {
-  IDLE,
-  UP,
-  DOWN,
-} DIRECTION;
+
+#define MAX_PLAYER_BONUS 3
 
 typedef struct {
   Rectangle rec;
@@ -12,7 +10,7 @@ typedef struct {
   int score;
   int velocity;
   Color color;
-  DIRECTION direction;
+  Bonus bonusses[MAX_PLAYER_BONUS];
 } Player;
 
 Player *init_player(int no);

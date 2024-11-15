@@ -27,7 +27,6 @@ Player *init_player(int no) {
   player->no = no;
   player->score = 0;
   player->velocity = DEFAULT_PLAYER_VELOCITY;
-  player->direction = IDLE;
   return player;
 }
 

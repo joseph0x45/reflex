@@ -26,4 +26,6 @@ Ball *init_ball() {
   return ball;
 }
 
-void draw_ball(Ball *ball) { DrawRectangleRec(ball->rec, PURPLE); }
+void draw_ball(Ball *ball) {
+  DrawRectangleRec(ball->rec, PURPLE);
+}

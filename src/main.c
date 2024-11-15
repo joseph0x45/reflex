@@ -7,16 +7,15 @@
 const char *title = "Reflex";
 
 int main() {
-  Game *game = init_game();
   srand(time(NULL));
+  Game *game = init_game();
   InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, title);
   SetTargetFPS(60);
   while (!WindowShouldClose()) {
-    BeginDrawing();
-    ClearBackground(BLACK);
-    DrawFPS(30, 30);
     handle_input(game);
     draw_game(game);
+    BeginDrawing();
+    ClearBackground(BLACK);
     EndDrawing();
   }
   return 0;
